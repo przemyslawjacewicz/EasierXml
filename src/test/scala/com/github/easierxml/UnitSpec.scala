@@ -17,4 +17,9 @@ object UnitSpec {
   }
 
   val nonEmptyAlphaStrGen: Gen[String] = Gen.alphaStr suchThat ((_: String).nonEmpty)
+
+  //  val xPathGen: Gen[String] = for (levels <- Gen.choose(0, 6)) yield {
+  //    (0 to levels map (_ => nonEmptyAlphaStrGen.sampleValue)).mkString("/", "/", "")
+  //  }
+
 }

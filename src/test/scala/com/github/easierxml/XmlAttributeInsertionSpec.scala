@@ -5,6 +5,7 @@ class XmlAttributeInsertionSpec extends UnitSpec {
 
 
   /*===== TESTS =====*/
+  /* set */
   "Xml.using(Document).at(String).setValue(String).getDocument()" should "return a Try.Success with a modified Document for a Document and an attribute xPath when attribute is not present" in {
     fail("Not yet implemented!")
   }
@@ -13,6 +14,7 @@ class XmlAttributeInsertionSpec extends UnitSpec {
     fail("Not yet implemented!")
   }
 
+  /* add */
   "Xml.using(Document).at(String).addValue(String).getDocument()" should "return a Try.Success with a modified Document for a Document and an attribute xPath when attribute is not present" in {
     fail("Not yet implemented!")
   }
