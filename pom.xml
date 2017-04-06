@@ -8,7 +8,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <name>EasierXml</name>
-    <description>Wrapper library for Java API for XML Processing</description>
+    <description>Wrapper library for Java API for XML Processing using DOM</description>
 
     <properties>
         <java.version>1.8</java.version>
