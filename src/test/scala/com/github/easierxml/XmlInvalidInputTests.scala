@@ -3,6 +3,7 @@ package com.github.easierxml
 import java.util.function.Consumer
 import java.util.stream.Stream
 import javaslang.control.Try
+import javax.xml.parsers.DocumentBuilderFactory
 
 import com.github.easierxml.UnitSpec._
 import org.w3c.dom.Document
@@ -27,7 +28,7 @@ class XmlInvalidInputTests extends UnitSpec {
 
   "Xml.using(Document).at(String).getValues()" should "return a Try.Failure with an exception for an invalid Document and an invalid xPath String" in {
     val document = stub[Document]
-    val xPath = "..."
+    val xPath = "i am an invalid xPath"
 
     val value: Try[Stream[String]] = Xml.using(document).at(xPath).getValues
 
@@ -68,24 +69,97 @@ class XmlInvalidInputTests extends UnitSpec {
   }
 
   it should "return a Try.Failure with an exception for a valid Document and an invalid xPath String" in {
-    fail("Not yet implemented!")
+    val dbf = DocumentBuilderFactory.newInstance()
+    val builder = dbf.newDocumentBuilder()
+    val document = builder.newDocument()
+    val root = document.createElement("root")
+    document.appendChild(root)
+
+    val xPath = "i am an invalid xPath !"
+
+    val value: Try[Stream[String]] = Xml.using(document).at(xPath).getValues
+
+    value shouldBe a[Try.Failure[_]]
+    value.onFailure(new Consumer[Throwable] {
+      override def accept(t: Throwable): Unit = {
+        t shouldBe an[XmlContentException]
+      }
+    })
   }
 
   /* insertion */
   "Xml.using(Document).at(String).setValue(String)" should "return a Try.Failure with an exception for an invalid Document and an invalid xPath String" in {
-    fail("Not yet implemented!")
+    val document = stub[Document]
+    val xPath = "i am an invalid xPath"
+
+    val toBeInserted = "insert me!"
+
+    val value: Try[Document] = Xml.using(document).at(xPath).setValue(toBeInserted)
+
+    value shouldBe a[Try.Failure[_]]
+    value.onFailure(new Consumer[Throwable] {
+      override def accept(t: Throwable): Unit = {
+        t shouldBe an[XmlContentException]
+      }
+    })
   }
 
   it should "return a Try.Failure with an exception for a valid Document and an invalid xPath String" in {
-    fail("Not yet implemented!")
+    val dbf = DocumentBuilderFactory.newInstance()
+    val builder = dbf.newDocumentBuilder()
+    val document = builder.newDocument()
+    val root = document.createElement("root")
+    document.appendChild(root)
+
+    val xPath = "i am an invalid xPath"
+
+    val toBeInserted = "insert me!"
+
+    val value: Try[Document] = Xml.using(document).at(xPath).setValue(toBeInserted)
+
+    value shouldBe a[Try.Failure[_]]
+    value.onFailure(new Consumer[Throwable] {
+      override def accept(t: Throwable): Unit = {
+        t shouldBe an[XmlContentException]
+      }
+    })
   }
 
   "Xml.using(Document).at(String).addValue(String)" should "return a Try.Failure with an exception for an invalid Document and an invalid xPath String" in {
-    fail("Not yet implemented!")
+    val document = stub[Document]
+    val xPath = "i am an invalid xPath"
+
+    val toBeInserted = "insert me!"
+
+    val value: Try[Document] = Xml.using(document).at(xPath).addValue(toBeInserted)
+
+    value shouldBe a[Try.Failure[_]]
+    value.onFailure(new Consumer[Throwable] {
+      override def accept(t: Throwable): Unit = {
+        t shouldBe an[XmlContentException]
+      }
+    })
   }
 
   it should "return a Try.Failure with an exception for a valid Document and an invalid xPath String" in {
-    fail("Not yet implemented!")
+    val dbf = DocumentBuilderFactory.newInstance()
+    val builder = dbf.newDocumentBuilder()
+    val document = builder.newDocument()
+    val root = document.createElement("root")
+    document.appendChild(root)
+
+    val xPath = "i am an invalid xPath"
+
+    val toBeInserted = "insert me!"
+
+    val value: Try[Document] = Xml.using(document).at(xPath).addValue(toBeInserted)
+
+    value shouldBe a[Try.Failure[_]]
+    value.onFailure(new Consumer[Throwable] {
+      override def accept(t: Throwable): Unit = {
+        t shouldBe an[XmlContentException]
+      }
+    })
   }
 
 }

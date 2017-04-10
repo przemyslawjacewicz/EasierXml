@@ -36,4 +36,28 @@ public class AtXPath {
                 })
                 .recoverWith(ex -> Try.failure(new XmlContentException(ex)));
     }
+
+    public Try<Document> setValue(String value) {
+        XPath theXPath = XPathFactory.newInstance().newXPath();
+
+        return Try
+                .of(() -> {
+                    NodeList nodeList = (NodeList) theXPath.evaluate(xPath, document.getDocumentElement(), XPathConstants.NODESET);
+
+                    if (nodeList.getLength() != 1) {
+                        throw new Exception("Node list contains more than one node");
+                    }
+
+                    return nodeList.item(0);
+                })
+                .map(node -> {
+                    node.setTextContent(value);
+                    return document;
+                })
+                .recoverWith(ex -> Try.failure(new XmlContentException(ex)));
+    }
+
+    public Try<Document> addValue(String value) {
+        return setValue(value);
+    }
 }
