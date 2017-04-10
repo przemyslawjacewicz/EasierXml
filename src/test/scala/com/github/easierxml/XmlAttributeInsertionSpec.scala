@@ -1,5 +1,13 @@
 package com.github.easierxml
 
+import java.util.function.Consumer
+import javaslang.control.Try
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.xpath.{XPathConstants, XPathFactory}
+
+import com.github.easierxml.UnitSpec._
+import org.w3c.dom.{Document, NodeList}
+
 class XmlAttributeInsertionSpec extends UnitSpec {
   /*===== SETUP =====*/
 
@@ -7,7 +15,31 @@ class XmlAttributeInsertionSpec extends UnitSpec {
   /*===== TESTS =====*/
   /* set */
   "Xml.using(Document).at(String).setValue(String).getDocument()" should "return a Try.Success with a modified Document for a Document and an attribute xPath when attribute is not present" in {
-    fail("Not yet implemented!")
+    val dbf = DocumentBuilderFactory.newInstance()
+    val builder = dbf.newDocumentBuilder()
+    val document = builder.newDocument()
+
+    val xPath = s"${attributeXPathGen.sampleValue}"
+    info(s"xPath=$xPath")
+
+    val toBeInserted = "insert me!"
+
+    val newDocument: Try[Document] = Xml.using(document).at(xPath).setValue(toBeInserted)
+
+    newDocument shouldBe a[Try.Success[_]]
+    newDocument.onSuccess(new Consumer[Document] {
+      override def accept(d: Document): Unit = {
+        d.getDocumentElement.getNodeName should be(document.getDocumentElement.getNodeName)
+
+        val theXPath = XPathFactory.newInstance().newXPath()
+
+        val nodeList = theXPath.evaluate(xPath, d.getDocumentElement, XPathConstants.NODESET).asInstanceOf[NodeList]
+        nodeList.getLength should be(1)
+
+        val node = nodeList.item(0)
+        node.getTextContent should be(toBeInserted)
+      }
+    })
   }
 
   it should "return a Try.Success with a modified Document for a Document and an attribute xPath when attribute is present" in {

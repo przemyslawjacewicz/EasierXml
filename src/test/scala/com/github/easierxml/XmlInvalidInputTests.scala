@@ -94,10 +94,10 @@ class XmlInvalidInputTests extends UnitSpec {
 
     val toBeInserted = "insert me!"
 
-    val value: Try[Document] = Xml.using(document).at(xPath).setValue(toBeInserted)
+    val newDocument: Try[Document] = Xml.using(document).at(xPath).setValue(toBeInserted)
 
-    value shouldBe a[Try.Failure[_]]
-    value.onFailure(new Consumer[Throwable] {
+    newDocument shouldBe a[Try.Failure[_]]
+    newDocument.onFailure(new Consumer[Throwable] {
       override def accept(t: Throwable): Unit = {
         t shouldBe an[XmlContentException]
       }
@@ -108,17 +108,16 @@ class XmlInvalidInputTests extends UnitSpec {
     val dbf = DocumentBuilderFactory.newInstance()
     val builder = dbf.newDocumentBuilder()
     val document = builder.newDocument()
-    val root = document.createElement("root")
-    document.appendChild(root)
+    document.appendChild(document.createElement("root"))
 
     val xPath = "i am an invalid xPath"
 
     val toBeInserted = "insert me!"
 
-    val value: Try[Document] = Xml.using(document).at(xPath).setValue(toBeInserted)
+    val newDocument: Try[Document] = Xml.using(document).at(xPath).setValue(toBeInserted)
 
-    value shouldBe a[Try.Failure[_]]
-    value.onFailure(new Consumer[Throwable] {
+    newDocument shouldBe a[Try.Failure[_]]
+    newDocument.onFailure(new Consumer[Throwable] {
       override def accept(t: Throwable): Unit = {
         t shouldBe an[XmlContentException]
       }
@@ -131,10 +130,10 @@ class XmlInvalidInputTests extends UnitSpec {
 
     val toBeInserted = "insert me!"
 
-    val value: Try[Document] = Xml.using(document).at(xPath).addValue(toBeInserted)
+    val newDocument: Try[Document] = Xml.using(document).at(xPath).addValue(toBeInserted)
 
-    value shouldBe a[Try.Failure[_]]
-    value.onFailure(new Consumer[Throwable] {
+    newDocument shouldBe a[Try.Failure[_]]
+    newDocument.onFailure(new Consumer[Throwable] {
       override def accept(t: Throwable): Unit = {
         t shouldBe an[XmlContentException]
       }
@@ -145,17 +144,16 @@ class XmlInvalidInputTests extends UnitSpec {
     val dbf = DocumentBuilderFactory.newInstance()
     val builder = dbf.newDocumentBuilder()
     val document = builder.newDocument()
-    val root = document.createElement("root")
-    document.appendChild(root)
+    document.appendChild(document.createElement("root"))
 
     val xPath = "i am an invalid xPath"
 
     val toBeInserted = "insert me!"
 
-    val value: Try[Document] = Xml.using(document).at(xPath).addValue(toBeInserted)
+    val newDocument: Try[Document] = Xml.using(document).at(xPath).addValue(toBeInserted)
 
-    value shouldBe a[Try.Failure[_]]
-    value.onFailure(new Consumer[Throwable] {
+    newDocument shouldBe a[Try.Failure[_]]
+    newDocument.onFailure(new Consumer[Throwable] {
       override def accept(t: Throwable): Unit = {
         t shouldBe an[XmlContentException]
       }

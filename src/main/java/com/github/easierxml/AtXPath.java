@@ -8,8 +8,11 @@ import org.w3c.dom.NodeList;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class AtXPath {
@@ -38,17 +41,41 @@ public class AtXPath {
     }
 
     public Try<Document> setValue(String value) {
+        List<String> splitted = Arrays
+                .stream(xPath.split("/"))
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+        List<String> nodeXPaths = IntStream
+                .rangeClosed(1, splitted.size())
+                .mapToObj(position -> splitted.subList(0, position)
+                        .stream()
+                        .collect(Collectors.joining("/", "/", "")))
+                .collect(Collectors.toList());
+
         XPath theXPath = XPathFactory.newInstance().newXPath();
+
+        nodeXPaths
+                .forEach(subPath -> {
+                    Try
+                            .of(() -> (Node) theXPath.evaluate(subPath, document.getDocumentElement(), XPathConstants.NODE))
+                            .onFailure(ex -> {
+
+
+                            });
+
+                });
+
 
         return Try
                 .of(() -> {
-                    NodeList nodeList = (NodeList) theXPath.evaluate(xPath, document.getDocumentElement(), XPathConstants.NODESET);
+                    Node node = (Node) theXPath.evaluate(xPath, document.getDocumentElement(), XPathConstants.NODE);
 
-                    if (nodeList.getLength() != 1) {
-                        throw new Exception("Node list contains more than one node");
-                    }
+//                    if (nodeList.getLength() != 1) {
+//                        throw new Exception("Node list contains more than one node");
+//                    }
 
-                    return nodeList.item(0);
+                    System.out.println("node: " + node);
+                    return node;
                 })
                 .map(node -> {
                     node.setTextContent(value);
