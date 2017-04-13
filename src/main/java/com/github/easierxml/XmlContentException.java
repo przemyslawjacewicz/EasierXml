@@ -6,4 +6,7 @@ public class XmlContentException extends Exception {
         super(cause);
     }
 
+    public XmlContentException(String message) {
+        super(message);
+    }
 }

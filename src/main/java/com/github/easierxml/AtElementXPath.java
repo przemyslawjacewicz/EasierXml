@@ -4,6 +4,7 @@ import javaslang.control.Try;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -48,44 +49,48 @@ public class AtElementXPath extends AtXPath {
                         Node root = super.getDocument().getDocumentElement();
                         Node newRoot = newDocument.importNode(root, true);
                         newDocument.appendChild(newRoot);
+                    } else {
+                        Element root = newDocument.createElement(elements
+                                .entrySet()
+                                .stream()
+                                .sorted((x, y) -> x.getValue().length() - y.getValue().length())
+                                .map(entry -> entry.getKey())
+                                .iterator().next());
+                        newDocument.appendChild(root);
                     }
 
                     return newDocument;
                 })
-                .map(newDocument -> {
-                    final Node[] parent = {newDocument};
-                    elements
-                            .entrySet()
-                            .stream()
-                            .sorted((x, y) -> x.getValue().length() - y.getValue().length())
-                            .forEach(entry -> {
+                .mapTry(newDocument -> {
+                            Map<String, String> elementsWithoutRoot = elements
+                                    .entrySet()
+                                    .stream()
+                                    .sorted((x, y) -> x.getValue().length() - y.getValue().length())
+                                    .skip(1)
+                                    .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+
+                            Node parent = newDocument.getDocumentElement();
+                            for (Map.Entry<String, String> entry : elementsWithoutRoot.entrySet()) {
                                 String name = entry.getKey();
                                 String subXPath = entry.getValue();
-                                Try
-                                        .of(() -> {
-                                            System.out.println(String.format("name: %s, subXPath: %s", name, subXPath));
-                                            Element result = (Element) theXPath.evaluate(subXPath, newDocument.getDocumentElement(), XPathConstants.NODE);
-                                            if (result == null) {
-                                                throw new Exception("Node not present: " + name);
-                                            }
+                                System.out.println("name:" + name + ", subXPath: " + subXPath);
 
-                                            return result;
-                                        })
-                                        .onFailure(ex -> {
-                                            System.out.println("onFailure: " + ex);
-                                            Element element = newDocument.createElement(name);
-                                            parent[0].appendChild(element);
-                                            parent[0] = element;
-                                        })
-                                        .onSuccess(element -> {
-                                            System.out.println("onSuccess: " + element.getNodeName());
-                                            parent[0] = element;
-                                        });
-                            });
-                    parent[0].setTextContent(value);
+                                NodeList result = (NodeList) theXPath.evaluate(subXPath, newDocument, XPathConstants.NODESET);
+                                if (result == null || result.getLength() == 0) {
+                                    Element element = newDocument.createElement(name);
+                                    parent.appendChild(element);
+                                    parent = element;
+                                } else if (result.getLength() == 1) {
+                                    parent = result.item(0);
+                                } else {
+                                    throw new XmlContentException(String.format("XPath ambiguous: %s", subXPath));
+                                }
+                            }
+                            parent.setTextContent(value);
 
-                    return newDocument;
-                });
+                            return newDocument;
+                        }
+                );
     }
 
     @Override
