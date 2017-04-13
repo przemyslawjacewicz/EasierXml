@@ -26,10 +26,12 @@ class XmlAttributeInsertionSpec extends UnitSpec {
 
     val newDocument: Try[Document] = Xml.using(document).at(xPath).setValue(toBeInserted)
 
+    document.getDocumentElement shouldBe(null)
     newDocument shouldBe a[Try.Success[_]]
     newDocument.onSuccess(new Consumer[Document] {
       override def accept(d: Document): Unit = {
-        d.getDocumentElement.getNodeName should be(document.getDocumentElement.getNodeName)
+        info(s"root name: ${xPath.split("/").filter(s => s.nonEmpty).head}")
+        d.getDocumentElement.getNodeName should be( xPath.split("/").filter(s => s.nonEmpty).head )
 
         val theXPath = XPathFactory.newInstance().newXPath()
 
