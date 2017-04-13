@@ -65,7 +65,7 @@ public class AtAttributeXPath extends AtXPath {
                                 String subXPath = entry.getValue();
                                 Try
                                         .of(() -> {
-                                            System.out.println(String.format("name: %s, subXPath: %s", name, subXPath));
+//                                            System.out.println(String.format("name: %s, subXPath: %s", name, subXPath));
                                             Element result = (Element) theXPath.evaluate(subXPath, newDocument.getDocumentElement(), XPathConstants.NODE);
                                             if (result == null) {
                                                 throw new Exception("Node not present: " + name);
@@ -74,13 +74,13 @@ public class AtAttributeXPath extends AtXPath {
                                             return result;
                                         })
                                         .onFailure(ex -> {
-                                            System.out.println("onFailure: " + ex);
+//                                            System.out.println("onFailure: " + ex);
                                             Element element = newDocument.createElement(name);
                                             parent[0].appendChild(element);
                                             parent[0] = element;
                                         })
                                         .onSuccess(element -> {
-                                            System.out.println("onSuccess: " + element.getNodeName());
+//                                            System.out.println("onSuccess: " + element.getNodeName());
                                             parent[0] = element;
                                         });
                             });
