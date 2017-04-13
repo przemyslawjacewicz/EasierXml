@@ -10,6 +10,11 @@ public class UsingDocument {
     }
 
     public AtXPath at(String xPath) {
-        return new AtXPath(document, xPath);
+        String[] splitted = xPath.split("/");
+        if (splitted[splitted.length - 1].startsWith("@")) {
+            return new AtAttributeXPath(document, xPath);
+        }
+
+        return new AtElementXPath(document, xPath);
     }
 }
