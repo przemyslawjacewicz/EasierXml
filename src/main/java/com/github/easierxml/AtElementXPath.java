@@ -10,10 +10,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -55,7 +52,8 @@ public class AtElementXPath extends AtXPath {
                                 .stream()
                                 .sorted((x, y) -> x.getValue().length() - y.getValue().length())
                                 .map(entry -> entry.getKey())
-                                .iterator().next());
+                                .iterator()
+                                .next());
                         newDocument.appendChild(root);
                     }
 
@@ -70,7 +68,12 @@ public class AtElementXPath extends AtXPath {
                                     .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 
                             Node parent = newDocument.getDocumentElement();
-                            for (Map.Entry<String, String> entry : elementsWithoutRoot.entrySet()) {
+                            for (Map.Entry<String, String> entry : elementsWithoutRoot
+                                    .entrySet()
+                                    .stream()
+                                    .sorted((x, y) -> x.getValue().length() - y.getValue().length())
+                                    .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (v1, v2) -> v2, () -> new LinkedHashMap<>()))
+                                    .entrySet()) {
                                 String name = entry.getKey();
                                 String subXPath = entry.getValue();
                                 System.out.println("name:" + name + ", subXPath: " + subXPath);
