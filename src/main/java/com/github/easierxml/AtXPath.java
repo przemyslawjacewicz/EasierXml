@@ -10,6 +10,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class AtXPath {
@@ -27,6 +28,14 @@ public abstract class AtXPath {
 
     public String getXPath() {
         return xPath;
+    }
+
+    public Try<String> getValue() {
+        return getValues()
+                .map(stream -> stream
+                        .collect(Collectors.toList())
+                        .iterator()
+                        .next());
     }
 
     public Try<Stream<String>> getValues() {

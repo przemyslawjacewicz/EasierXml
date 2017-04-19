@@ -13,15 +13,48 @@ class XmlInvalidInputTests extends UnitSpec {
   /*===== TESTS =====*/
   /* extraction */
   "Xml.using(Document).at(String).getValue()" should "return a Try.Failure with an exception for an invalid Document and an invalid xPath String" in {
-    fail("Not yet implemented!")
+    val document = stub[Document]
+    val xPath = "i am an invalid xPath"
+    val value: Try[String] = Xml.using(document).at(xPath).getValue
+
+    value shouldBe a[Try.Failure[_]]
+    value.onFailure(withConsumer { ex =>
+      ex shouldBe an[XmlContentException]
+    })
   }
 
-  it should "return a Try.Failure with an exception for an invalid Document and a valid xPath String" in {
-    fail("Not yet implemented!")
+  it should "return a Try.Failure with an exception for an invalid Document and a valid attribute xPath String" in {
+    val document = stub[Document]
+    val xPath = attributeXPathGen.sampleValue
+    val value: Try[String] = Xml.using(document).at(xPath).getValue
+
+    value shouldBe a[Try.Failure[_]]
+    value.onFailure(withConsumer { ex =>
+      ex shouldBe an[XmlContentException]
+    })
+  }
+
+  it should "return a Try.Failure with an exception for an invalid Document and a valid element xPath String" in {
+    val document = stub[Document]
+    val xPath = elementXPathGen.sampleValue
+    val value: Try[String] = Xml.using(document).at(xPath).getValue
+
+    value shouldBe a[Try.Failure[_]]
+    value.onFailure(withConsumer { ex =>
+      ex shouldBe an[XmlContentException]
+    })
   }
 
   it should "return a Try.Failure with an exception for a valid Document and an invalid xPath String" in {
-    fail("Not yet implemented!")
+    val document = emptyDocument()
+    document.appendChild(document.createElement("root"))
+    val xPath = "i am an invalid xPath !"
+    val value: Try[Stream[String]] = Xml.using(document).at(xPath).getValues
+
+    value shouldBe a[Try.Failure[_]]
+    value.onFailure(withConsumer { ex =>
+      ex shouldBe an[XmlContentException]
+    })
   }
 
   "Xml.using(Document).at(String).getValues()" should "return a Try.Failure with an exception for an invalid Document and an invalid xPath String" in {
