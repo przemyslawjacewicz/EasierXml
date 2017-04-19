@@ -5,7 +5,6 @@ class XmlElementExtractionSpec extends UnitSpec {
 
 
   /*===== TESTS =====*/
-
   "Xml.using(Document).at(String).getValue()" should "return a Try.Failure with an exception for a Document and an element xPath when element is not present" in {
     fail("Not yet implemented!")
   }

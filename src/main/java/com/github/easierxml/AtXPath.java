@@ -35,7 +35,8 @@ public abstract class AtXPath {
                 .map(stream -> stream
                         .collect(Collectors.toList())
                         .iterator()
-                        .next());
+                        .next())
+                .recoverWith(ex -> Try.failure(new XmlContentException(ex)));
     }
 
     public Try<Stream<String>> getValues() {
@@ -43,14 +44,21 @@ public abstract class AtXPath {
 
         return Try
                 .of(() -> (NodeList) theXPath.evaluate(xPath, document.getDocumentElement(), XPathConstants.NODESET))
-                .map(nodeList -> {
+                .mapTry(nodeList -> {
+                    if (nodeList == null || nodeList.getLength() == 0) {
+                        throw new Exception("Attribute not present");
+                    }
+                    return nodeList;
+                })
+                .mapTry(nodeList -> {
                     List<Node> nodes = new LinkedList<>();
                     for (int i = 0; i < nodeList.getLength(); i++) {
                         nodes.add(nodeList.item(i));
                     }
 
-                    return nodes.stream().map(node -> node.getTextContent());
+                    return nodes;
                 })
+                .mapTry(nodes -> nodes.stream().map(node -> node.getTextContent()))
                 .recoverWith(ex -> Try.failure(new XmlContentException(ex)));
     }
 
