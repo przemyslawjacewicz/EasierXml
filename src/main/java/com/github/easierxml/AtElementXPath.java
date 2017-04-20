@@ -7,9 +7,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -22,20 +20,18 @@ public class AtElementXPath extends AtXPath {
 
     @Override
     public Try<Document> setValue(String value) {
-        List<String> splitted = Arrays
+        List<String> parts = Arrays
                 .stream(super.getXPath().split("/"))
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.toList());
 
         Map<String, String> elements = IntStream
-                .range(0, splitted.size())
-                .mapToObj(position -> new AbstractMap.SimpleImmutableEntry<>(splitted.get(position),
-                        splitted.subList(0, position + 1)
+                .range(0, parts.size())
+                .mapToObj(position -> new AbstractMap.SimpleImmutableEntry<>(parts.get(position),
+                        parts.subList(0, position + 1)
                                 .stream()
                                 .collect(Collectors.joining("/", "/", ""))))
                 .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
-
-        XPath theXPath = XPathFactory.newInstance().newXPath();
 
         return Try
                 .of(() -> DocumentBuilderFactory.newInstance().newDocumentBuilder())
@@ -77,7 +73,7 @@ public class AtElementXPath extends AtXPath {
                                 String name = entry.getKey();
                                 String subXPath = entry.getValue();
 
-                                NodeList result = (NodeList) theXPath.evaluate(subXPath, newDocument, XPathConstants.NODESET);
+                                NodeList result = (NodeList) XPATH.evaluate(subXPath, newDocument, XPathConstants.NODESET);
                                 if (result == null || result.getLength() == 0) {
                                     Element element = newDocument.createElement(name);
                                     parent.appendChild(element);
@@ -97,20 +93,18 @@ public class AtElementXPath extends AtXPath {
 
     @Override
     public Try<Document> addValue(String value) {
-        List<String> splitted = Arrays
+        List<String> parts = Arrays
                 .stream(super.getXPath().split("/"))
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.toList());
 
         Map<String, String> elements = IntStream
-                .range(0, splitted.size())
-                .mapToObj(position -> new AbstractMap.SimpleImmutableEntry<>(splitted.get(position),
-                        splitted.subList(0, position + 1)
+                .range(0, parts.size())
+                .mapToObj(position -> new AbstractMap.SimpleImmutableEntry<>(parts.get(position),
+                        parts.subList(0, position + 1)
                                 .stream()
                                 .collect(Collectors.joining("/", "/", ""))))
                 .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
-
-        XPath theXPath = XPathFactory.newInstance().newXPath();
 
         return Try
                 .of(() -> DocumentBuilderFactory.newInstance().newDocumentBuilder())
@@ -135,13 +129,6 @@ public class AtElementXPath extends AtXPath {
                     return newDocument;
                 })
                 .mapTry(newDocument -> {
-//                            Map<String, String> elementsWithoutRoot = elements
-//                                    .entrySet()
-//                                    .stream()
-//                                    .sorted((x, y) -> x.getValue().length() - y.getValue().length())
-//                                    .skip(1)
-//                                    .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
-
                             Node parent = newDocument.getDocumentElement();
                             for (Map.Entry<String, String> entry : elements
                                     .entrySet()
@@ -154,7 +141,7 @@ public class AtElementXPath extends AtXPath {
                                 String name = entry.getKey();
                                 String subXPath = entry.getValue();
 
-                                NodeList result = (NodeList) theXPath.evaluate(subXPath, newDocument, XPathConstants.NODESET);
+                                NodeList result = (NodeList) XPATH.evaluate(subXPath, newDocument, XPathConstants.NODESET);
                                 if (result == null || result.getLength() == 0) {
                                     Element element = newDocument.createElement(name);
                                     parent.appendChild(element);

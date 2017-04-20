@@ -7,6 +7,8 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 public class UsingDocument {
+    private static final XPath XPATH = XPathFactory.newInstance().newXPath();
+
     private Document document;
 
     public UsingDocument(Document document) {
@@ -14,16 +16,14 @@ public class UsingDocument {
     }
 
     public AtXPath at(String xPath) {
-        XPath theXPath = XPathFactory.newInstance().newXPath();
-
         try {
-            theXPath.compile(xPath);
+            XPATH.compile(xPath);
         } catch (XPathExpressionException e) {
             return new AtInvalidXPath(document, xPath);
         }
 
-        String[] splitted = xPath.split("/");
-        if (splitted[splitted.length - 1].startsWith("@")) {
+        String[] parts = xPath.split("/");
+        if (parts[parts.length - 1].startsWith("@")) {
             return new AtAttributeXPath(document, xPath);
         }
 

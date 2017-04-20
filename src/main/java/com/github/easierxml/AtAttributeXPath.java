@@ -6,9 +6,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +22,7 @@ public class AtAttributeXPath extends AtXPath {
 
     @Override
     public Try<Document> setValue(String value) {
-        List<String> splitted = Arrays
+        List<String> parts = Arrays
                 .stream(super.getXPath().split("/"))
                 .filter(s -> !s.isEmpty())
                 .filter(s -> !s.startsWith("@"))
@@ -32,14 +30,12 @@ public class AtAttributeXPath extends AtXPath {
         String attributeName = super.getXPath().substring(super.getXPath().lastIndexOf("@") + 1);
 
         Map<String, String> elements = IntStream
-                .range(0, splitted.size())
-                .mapToObj(position -> new AbstractMap.SimpleImmutableEntry<>(splitted.get(position),
-                        splitted.subList(0, position + 1)
+                .range(0, parts.size())
+                .mapToObj(position -> new AbstractMap.SimpleImmutableEntry<>(parts.get(position),
+                        parts.subList(0, position + 1)
                                 .stream()
                                 .collect(Collectors.joining("/", "/", ""))))
                 .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
-
-        XPath theXPath = XPathFactory.newInstance().newXPath();
 
         return Try
                 .of(() -> DocumentBuilderFactory.newInstance().newDocumentBuilder())
@@ -65,8 +61,7 @@ public class AtAttributeXPath extends AtXPath {
                                 String subXPath = entry.getValue();
                                 Try
                                         .of(() -> {
-//                                            System.out.println(String.format("name: %s, subXPath: %s", name, subXPath));
-                                            Element result = (Element) theXPath.evaluate(subXPath, newDocument.getDocumentElement(), XPathConstants.NODE);
+                                            Element result = (Element) XPATH.evaluate(subXPath, newDocument.getDocumentElement(), XPathConstants.NODE);
                                             if (result == null) {
                                                 throw new Exception("Node not present: " + name);
                                             }
@@ -74,13 +69,11 @@ public class AtAttributeXPath extends AtXPath {
                                             return result;
                                         })
                                         .onFailure(ex -> {
-//                                            System.out.println("onFailure: " + ex);
                                             Element element = newDocument.createElement(name);
                                             parent[0].appendChild(element);
                                             parent[0] = element;
                                         })
                                         .onSuccess(element -> {
-//                                            System.out.println("onSuccess: " + element.getNodeName());
                                             parent[0] = element;
                                         });
                             });

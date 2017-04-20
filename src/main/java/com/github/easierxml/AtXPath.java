@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class AtXPath {
+    protected static final XPath XPATH = XPathFactory.newInstance().newXPath();
+
     private Document document;
     private String xPath;
 
@@ -44,10 +46,8 @@ public abstract class AtXPath {
     }
 
     public Try<Stream<String>> getValues() {
-        XPath theXPath = XPathFactory.newInstance().newXPath();
-
         return Try
-                .of(() -> (NodeList) theXPath.evaluate(xPath, document.getDocumentElement(), XPathConstants.NODESET))
+                .of(() -> (NodeList) XPATH.evaluate(xPath, document.getDocumentElement(), XPathConstants.NODESET))
                 .mapTry(nodeList -> {
                     if (nodeList == null || nodeList.getLength() == 0) {
                         throw new Exception("Node not present");
