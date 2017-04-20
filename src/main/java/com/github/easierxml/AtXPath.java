@@ -32,10 +32,14 @@ public abstract class AtXPath {
 
     public Try<String> getValue() {
         return getValues()
-                .map(stream -> stream
-                        .collect(Collectors.toList())
-                        .iterator()
-                        .next())
+                .mapTry(stream -> stream.collect(Collectors.toList()))
+                .mapTry(values -> {
+                    if (values.size() != 1) {
+                        throw new Exception("Node number does not equal one");
+                    }
+                    return values;
+                })
+                .mapTry(values -> values.iterator().next())
                 .recoverWith(ex -> Try.failure(new XmlContentException(ex)));
     }
 
@@ -46,7 +50,7 @@ public abstract class AtXPath {
                 .of(() -> (NodeList) theXPath.evaluate(xPath, document.getDocumentElement(), XPathConstants.NODESET))
                 .mapTry(nodeList -> {
                     if (nodeList == null || nodeList.getLength() == 0) {
-                        throw new Exception("Attribute not present");
+                        throw new Exception("Node not present");
                     }
                     return nodeList;
                 })
