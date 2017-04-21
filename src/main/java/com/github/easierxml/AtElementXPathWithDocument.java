@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class AtElementXPath extends AtXPath {
+public class AtElementXPathWithDocument extends AtXPathWithDocument {
 
-    public AtElementXPath(Document document, String xPath, List<String> parts) {
+    public AtElementXPathWithDocument(Document document, String xPath, List<String> parts) {
         super(document, xPath, parts);
     }
 

@@ -5,9 +5,9 @@ import org.w3c.dom.Document;
 
 import java.util.ArrayList;
 
-public class AtInvalidXPath extends AtXPath {
+public class AtInvalidXPathWithDocument extends AtXPathWithDocument {
 
-    protected AtInvalidXPath(Document document, String xPath) {
+    protected AtInvalidXPathWithDocument(Document document, String xPath) {
         super(document, xPath, new ArrayList<>());
     }
 

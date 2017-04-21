@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class AtAttributeXPath extends AtXPath {
+public class AtAttributeXPathWithDocument extends AtXPathWithDocument {
     private String attributeName;
 
-    public AtAttributeXPath(Document document, String xPath, List<String> parts) {
+    public AtAttributeXPathWithDocument(Document document, String xPath, List<String> parts) {
         super(document, xPath, parts);
         this.attributeName = xPath.substring(xPath.lastIndexOf("@") + 1);
     }

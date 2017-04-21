@@ -6,7 +6,7 @@ import javaslang.control.Try
 import com.github.easierxml.UnitSpec._
 import org.w3c.dom.Document
 
-class XmlInvalidInputTests extends UnitSpec {
+class XmlInvalidInputUsingDocumentSpec extends UnitSpec {
   /*===== SETUP =====*/
   private[this] val toBeInserted = "insert me!"
 
