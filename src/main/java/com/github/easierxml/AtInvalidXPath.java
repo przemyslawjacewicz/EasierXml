@@ -3,10 +3,12 @@ package com.github.easierxml;
 import javaslang.control.Try;
 import org.w3c.dom.Document;
 
+import java.util.ArrayList;
+
 public class AtInvalidXPath extends AtXPath {
 
     protected AtInvalidXPath(Document document, String xPath) {
-        super(document, xPath);
+        super(document, xPath, new ArrayList<>());
     }
 
     @Override

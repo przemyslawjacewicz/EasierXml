@@ -2,15 +2,20 @@ package com.github.easierxml;
 
 import javaslang.control.Try;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public abstract class AtXPath {
@@ -18,18 +23,30 @@ public abstract class AtXPath {
 
     private Document document;
     private String xPath;
+    private Map<String, String> elements;
 
-    protected AtXPath(Document document, String xPath) {
+    protected AtXPath(Document document, String xPath, List<String> parts) {
         this.document = document;
         this.xPath = xPath;
+        this.elements = IntStream
+                .range(0, parts.size())
+                .mapToObj(position -> new AbstractMap.SimpleImmutableEntry<>(parts.get(position),
+                        parts.subList(0, position + 1)
+                                .stream()
+                                .collect(Collectors.joining("/", "/", ""))))
+                .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
     }
 
-    public Document getDocument() {
+    protected Document getDocument() {
         return document;
     }
 
-    public String getXPath() {
+    protected String getXPath() {
         return xPath;
+    }
+
+    protected Map<String, String> getElements() {
+        return elements;
     }
 
     public Try<String> getValue() {
@@ -64,6 +81,32 @@ public abstract class AtXPath {
                 })
                 .mapTry(nodes -> nodes.stream().map(node -> node.getTextContent()))
                 .recoverWith(ex -> Try.failure(new XmlContentException(ex)));
+    }
+
+    protected Try<Document> initDocument() {
+        return Try
+                .of(() -> DocumentBuilderFactory.newInstance().newDocumentBuilder())
+                .mapTry(documentBuilder -> {
+                    Document newDocument = documentBuilder.newDocument();
+
+                    if (document.getDocumentElement() != null) {
+                        Node root = document.getDocumentElement();
+                        Node newRoot = newDocument.importNode(root, true);
+                        newDocument.appendChild(newRoot);
+                    } else {
+                        Element root = newDocument.createElement(elements
+                                .entrySet()
+                                .stream()
+                                .sorted((x, y) -> x.getValue().length() - y.getValue().length())
+                                .map(entry -> entry.getKey())
+                                .iterator()
+                                .next());
+                        newDocument.appendChild(root);
+                    }
+
+
+                    return newDocument;
+                });
     }
 
     public abstract Try<Document> setValue(String value);

@@ -5,6 +5,8 @@ import org.w3c.dom.Document;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class UsingDocument {
     private static final XPath XPATH = XPathFactory.newInstance().newXPath();
@@ -24,9 +26,16 @@ public class UsingDocument {
 
         String[] parts = xPath.split("/");
         if (parts[parts.length - 1].startsWith("@")) {
-            return new AtAttributeXPath(document, xPath);
+            return new AtAttributeXPath(document, xPath, Arrays
+                    .stream(xPath.split("/"))
+                    .filter(s -> !s.isEmpty())
+                    .filter(s -> !s.startsWith("@"))
+                    .collect(Collectors.toList()));
         }
 
-        return new AtElementXPath(document, xPath);
+        return new AtElementXPath(document, xPath, Arrays
+                .stream(xPath.split("/"))
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList()));
     }
 }

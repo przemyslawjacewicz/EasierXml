@@ -1,83 +1,59 @@
 package com.github.easierxml;
 
+import javaslang.Tuple;
 import javaslang.control.Try;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathConstants;
-import java.util.AbstractMap;
-import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class AtAttributeXPath extends AtXPath {
+    private String attributeName;
 
-    public AtAttributeXPath(Document document, String xPath) {
-        super(document, xPath);
+    public AtAttributeXPath(Document document, String xPath, List<String> parts) {
+        super(document, xPath, parts);
+        this.attributeName = xPath.substring(xPath.lastIndexOf("@") + 1);
     }
 
     @Override
     public Try<Document> setValue(String value) {
-        List<String> parts = Arrays
-                .stream(super.getXPath().split("/"))
-                .filter(s -> !s.isEmpty())
-                .filter(s -> !s.startsWith("@"))
-                .collect(Collectors.toList());
-        String attributeName = super.getXPath().substring(super.getXPath().lastIndexOf("@") + 1);
+        return initDocument()
+                .mapTry(newDocument -> {
+                    Element parent = newDocument.getDocumentElement();
 
-        Map<String, String> elements = IntStream
-                .range(0, parts.size())
-                .mapToObj(position -> new AbstractMap.SimpleImmutableEntry<>(parts.get(position),
-                        parts.subList(0, position + 1)
-                                .stream()
-                                .collect(Collectors.joining("/", "/", ""))))
-                .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
-
-        return Try
-                .of(() -> DocumentBuilderFactory.newInstance().newDocumentBuilder())
-                .map(documentBuilder -> {
-                    Document newDocument = documentBuilder.newDocument();
-
-                    if (super.getDocument().getDocumentElement() != null) {
-                        Node root = super.getDocument().getDocumentElement();
-                        Node newRoot = newDocument.importNode(root, true);
-                        newDocument.appendChild(newRoot);
-                    }
-
-                    return newDocument;
-                })
-                .map(newDocument -> {
-                    final Node[] parent = {newDocument};
-                    elements
+                    for (Map.Entry<String, String> entry : super.getElements()
                             .entrySet()
                             .stream()
                             .sorted((x, y) -> x.getValue().length() - y.getValue().length())
-                            .forEach(entry -> {
-                                String name = entry.getKey();
-                                String subXPath = entry.getValue();
-                                Try
-                                        .of(() -> {
-                                            Element result = (Element) XPATH.evaluate(subXPath, newDocument.getDocumentElement(), XPathConstants.NODE);
-                                            if (result == null) {
-                                                throw new Exception("Node not present: " + name);
-                                            }
+                            .skip(1)
+                            .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (v1, v2) -> v2, () -> new LinkedHashMap<>()))
+                            .entrySet()) {
+                        String name = entry.getKey();
+                        String subXPath = entry.getValue();
 
-                                            return result;
-                                        })
-                                        .onFailure(ex -> {
-                                            Element element = newDocument.createElement(name);
-                                            parent[0].appendChild(element);
-                                            parent[0] = element;
-                                        })
-                                        .onSuccess(element -> {
-                                            parent[0] = element;
-                                        });
-                            });
-                    ((Element) parent[0]).setAttribute(attributeName, value);
+                        NodeList result = (NodeList) XPATH.evaluate(subXPath, newDocument, XPathConstants.NODESET);
+                        if (result == null || result.getLength() == 0) {
+                            Element element = newDocument.createElement(name);
+                            parent.appendChild(element);
+                            parent = element;
+                        } else {
+                            parent = (Element) result.item(0);
+                        }
+
+                    }
+
+                    return Tuple.of(newDocument, parent);
+                })
+                .mapTry(pair -> {
+                    Document newDocument = pair._1();
+                    Element parent = pair._2();
+
+                    parent.setAttribute(attributeName, value);
 
                     return newDocument;
                 });
