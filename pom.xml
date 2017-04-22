@@ -30,22 +30,6 @@
             <version>2.0.4</version>
         </dependency>
 
-        <!--<dependency>-->
-        <!--<groupId>ch.qos.logback</groupId>-->
-        <!--<artifactId>logback-core</artifactId>-->
-        <!--<version>1.1.7</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>ch.qos.logback</groupId>-->
-        <!--<artifactId>logback-classic</artifactId>-->
-        <!--<version>1.1.7</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>org.slf4j</groupId>-->
-        <!--<artifactId>slf4j-api</artifactId>-->
-        <!--<version>1.7.21</version>-->
-        <!--</dependency>-->
-
         <!-- testing -->
         <dependency>
             <groupId>org.scalatest</groupId>
@@ -128,13 +112,26 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>${main.class}</mainClass>
                             <addClasspath>true</addClasspath>
-                            <classpathPrefix>${lib.dir}</classpathPrefix>
                         </manifest>
                     </archive>
                 </configuration>
             </plugin>
         </plugins>
+
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ftp</artifactId>
+                <version>2.10</version>
+            </extension>
+        </extensions>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>mfarchive</id>
+            <url>ftp://mfarchive.imgw.ad/mf/repo/maven</url>
+        </repository>
+    </distributionManagement>
 </project>
