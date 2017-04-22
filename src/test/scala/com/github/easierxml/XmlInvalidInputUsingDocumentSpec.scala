@@ -60,7 +60,7 @@ class XmlInvalidInputUsingDocumentSpec extends UnitSpec {
   "Xml.using(Document).at(String).getValues()" should "return a Try.Failure with an exception for an invalid Document and an invalid xPath String" in {
     val document = stub[Document]
     val xPath = "i am an invalid xPath"
-    val value: Try[Stream[String]] = Xml.using(document).at(xPath).getValues()
+    val value: Try[Stream[String]] = Xml.using(document).at(xPath).getValues
 
     value shouldBe a[Try.Failure[_]]
     value.onFailure(withConsumer { ex =>

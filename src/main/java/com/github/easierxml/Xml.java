@@ -10,6 +10,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Path;
 import java.util.stream.Stream;
 
 public class Xml {
@@ -24,26 +25,69 @@ public class Xml {
             Document document = documentBuilder.parse(new InputSource(new StringReader(xml)));
             return using(document);
         } catch (ParserConfigurationException | SAXException | IOException ex) {
-            return xPath -> new AtXPath() {
+            return new Using() {
 
                 @Override
-                public Try<String> getValue() {
-                    return Try.failure(new XmlContentException(ex));
+                public AtXPath at(String xPath) {
+                    return new AtXPath() {
+
+                        @Override
+                        public Try<String> getValue() {
+                            return Try.failure(new XmlContentException(ex));
+                        }
+
+                        @Override
+                        public Try<Stream<String>> getValues() {
+                            return Try.failure(new XmlContentException(ex));
+                        }
+
+                        @Override
+                        public Try<Document> setValue(String value) {
+                            return Try.failure(new XmlContentException(ex));
+                        }
+
+                        @Override
+                        public Try<Document> addValue(String value) {
+                            return Try.failure(new XmlContentException(ex));
+                        }
+                    };
                 }
+            };
+        }
+    }
+
+    public static Using using(Path file) {
+        try {
+            DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document document = documentBuilder.parse(file.toFile());
+            return using(document);
+        } catch (ParserConfigurationException | SAXException | IOException ex) {
+            return new Using() {
 
                 @Override
-                public Try<Stream<String>> getValues() {
-                    return Try.failure(new XmlContentException(ex));
-                }
+                public AtXPath at(String xPath) {
+                    return new AtXPath() {
 
-                @Override
-                public Try<Document> setValue(String value) {
-                    return Try.failure(new XmlContentException(ex));
-                }
+                        @Override
+                        public Try<String> getValue() {
+                            return Try.failure(new XmlContentException(ex));
+                        }
 
-                @Override
-                public Try<Document> addValue(String value) {
-                    return Try.failure(new XmlContentException(ex));
+                        @Override
+                        public Try<Stream<String>> getValues() {
+                            return Try.failure(new XmlContentException(ex));
+                        }
+
+                        @Override
+                        public Try<Document> setValue(String value) {
+                            return Try.failure(new XmlContentException(ex));
+                        }
+
+                        @Override
+                        public Try<Document> addValue(String value) {
+                            return Try.failure(new XmlContentException(ex));
+                        }
+                    };
                 }
             };
         }

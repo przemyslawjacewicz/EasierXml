@@ -24,9 +24,9 @@ class XmlInvalidInputUsingStringSpec extends UnitSpec {
   }
 
   it should "return a Try.Failure with an exception for an invalid String and a valid attribute xPath String" in {
-    val str = "<root"
+    val xml = "<root"
     val xPath = attributeXPathGen.sampleValue
-    val value: Try[String] = Xml.using(str).at(xPath).getValue
+    val value: Try[String] = Xml.using(xml).at(xPath).getValue
 
     value shouldBe a[Try.Failure[_]]
     value.onFailure(withConsumer { ex =>
@@ -59,7 +59,7 @@ class XmlInvalidInputUsingStringSpec extends UnitSpec {
   "Xml.using(String).at(String).getValues()" should "return a Try.Failure with an exception for an invalid String and an invalid xPath String" in {
     val xml = "<root"
     val xPath = "i am an invalid xPath"
-    val value: Try[Stream[String]] = Xml.using(xml).at(xPath).getValues()
+    val value: Try[Stream[String]] = Xml.using(xml).at(xPath).getValues
 
     value shouldBe a[Try.Failure[_]]
     value.onFailure(withConsumer { ex =>
