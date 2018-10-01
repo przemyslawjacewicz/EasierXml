@@ -7,6 +7,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPathConstants;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,9 +27,9 @@ public class AtElementXPathWithDocument extends AtXPathWithDocument {
                             for (Map.Entry<String, String> entry : super.getElements()
                                     .entrySet()
                                     .stream()
-                                    .sorted((x, y) -> x.getValue().length() - y.getValue().length())
+                                    .sorted(Comparator.comparingInt(x -> x.getValue().length()))
                                     .skip(1)
-                                    .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (v1, v2) -> v2, () -> new LinkedHashMap<>()))
+                                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v2, LinkedHashMap::new))
                                     .entrySet()) {
                                 String name = entry.getKey();
                                 String subXPath = entry.getValue();

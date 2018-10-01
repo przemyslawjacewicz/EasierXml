@@ -8,10 +8,7 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathConstants;
-import java.util.AbstractMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -30,7 +27,7 @@ public abstract class AtXPathWithDocument implements AtXPath {
                         parts.subList(0, position + 1)
                                 .stream()
                                 .collect(Collectors.joining("/", "/", ""))))
-                .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
+                .collect(Collectors.toMap(AbstractMap.SimpleImmutableEntry::getKey, AbstractMap.SimpleImmutableEntry::getValue));
     }
 
     protected Document getDocument() {
@@ -77,7 +74,7 @@ public abstract class AtXPathWithDocument implements AtXPath {
 
                     return nodes;
                 })
-                .mapTry(nodes -> nodes.stream().map(node -> node.getTextContent()))
+                .mapTry(nodes -> nodes.stream().map(Node::getTextContent))
                 .recoverWith(ex -> Try.failure(new XmlContentException(ex)));
     }
 
@@ -95,8 +92,8 @@ public abstract class AtXPathWithDocument implements AtXPath {
                         Element root = newDocument.createElement(elements
                                 .entrySet()
                                 .stream()
-                                .sorted((x, y) -> x.getValue().length() - y.getValue().length())
-                                .map(entry -> entry.getKey())
+                                .sorted(Comparator.comparingInt(x -> x.getValue().length()))
+                                .map(Map.Entry::getKey)
                                 .iterator()
                                 .next());
                         newDocument.appendChild(root);
