@@ -24,7 +24,7 @@ public class Xml {
                     document.appendChild(element);
                     return using(document);
                 })
-                .getOrElseGet(ex -> new FailedUsing(ex));
+                .getOrElseGet(FailedUsing::new);
     }
 
     public static Using using(String xml) throws XmlContentException {
@@ -34,7 +34,7 @@ public class Xml {
                     Document document = documentBuilder.parse(new InputSource(new StringReader(xml)));
                     return using(document);
                 })
-                .getOrElseGet(ex -> new FailedUsing(ex));
+                .getOrElseGet(FailedUsing::new);
     }
 
     public static Using using(Path file) {
@@ -44,7 +44,7 @@ public class Xml {
                     Document document = documentBuilder.parse(file.toFile());
                     return using(document);
                 })
-                .getOrElseGet(ex -> new FailedUsing(ex));
+                .getOrElseGet(FailedUsing::new);
     }
 
     private static class FailedUsing implements Using {
