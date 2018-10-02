@@ -2,7 +2,9 @@ language: java
 
 sudo: false
 
-script: "mvn cobertura:cobertura"
+env:
+  global:
+    - CODECOV_TOKEN=354555d4-4396-4c53-814e-5d60bd204a4b
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
